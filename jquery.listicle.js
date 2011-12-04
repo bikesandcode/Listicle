@@ -21,7 +21,7 @@
       nullity, 
       isArray,
       buildList,
-      liClickHandler;
+      animate;
 
   //Crockford friendly
   nullity = function( thing ){ return thing === undefined || thing === null; };
@@ -29,7 +29,15 @@
   //http://ajaxian.com/archives/isarray-why-is-it-so-bloody-hard-to-get-right
   isArray = function( thing ){ return Object.prototype.toString.call(thing) === '[object Array]'; };
 
-  buildList = function( ul, list ){
+  //basic simple animate function as an example
+  animate = function( li, destinationUl ){
+    li.fadeOut(function(){
+      li.appendTo(destinationUl);
+      li.fadeIn();
+    });
+  };
+
+  buildList = function( sourceList, otherList, list ){
     $.each(list, function(index, value){
       var listObject = null, toAppend = $("<li></li>");
       if( typeof(value) === "string" ){ listObject = { id : value, text : value }; }
@@ -37,7 +45,12 @@
 
       toAppend.attr("id", "listicleElement-" + listObject.id);
       toAppend.text(listObject.text);
-      ul.append(toAppend);
+      sourceList.append(toAppend);
+    });
+
+    sourceList.find("li").click(function(){
+      //'move' the thing
+      animate($(this), otherList);
     });
   };
 
@@ -45,19 +58,22 @@
   $.fn.listicle = function(list1, list2){
     var root = $(this), list1Element, list2Element;
 
+    //setup, clear this out
+    root.empty();
+
     //basic usage checks
     if( nullity(list1) || nullity(list2) ){ throw "Neither lists can be nullish, both must be present" ;}
     if( !isArray(list1) || !isArray(list2) ){ throw "Both lists must actually be arrays."; }
     
     //setup lists
     root.append($("<ul></ul>").addClass("listicle-list1").addClass("listicle"));
-    list1Element = root.find(".listicle-list1");
-    buildList(list1Element, list1);
+    list1Element = root.find(".listicle-list1");    
 
     root.append($("<ul></ul>").addClass("listicle-list2").addClass("listicle"));
     list2Element = root.find(".listicle-list2");
-    buildList(list2Element, list2);
 
-    wireListClickHandlers();
+    buildList(list1Element, list2Element, list1);
+    buildList(list2Element, list1Element, list2);
+
   };
 }());
