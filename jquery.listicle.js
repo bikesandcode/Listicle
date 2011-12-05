@@ -124,6 +124,7 @@
       if( inList === firstList ){ animate($(this), $(".listicle-secondList")); }
       else{ animate($(this), $(".listicle-firstList")); }
       
+      // Logging for verification and such.
       var list1Out = "", list2Out = "";
       $.each(firstList, function(index, value){list1Out += value.id + ",";});
       $.each(secondList, function(index, value){list2Out += value.id + ",";});
