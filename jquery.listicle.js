@@ -6,16 +6,19 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  *
  * Usage:
- * $(selector).listicle( list1, list2 );
+ * $(selector).listicle( list1, list2, url );
  * 
  * list1, list2 : Elements are either strings, or {id : "key", text : "List Text"}
  * empty arrays should be used to indicate nothing in one <ul> or the other.
+ *
+ * url : Makes a $.get request to the url provided. Submits
+ * url?id=id&list=(1 or 2)
  */
 
 /*jslint devel: true, browser: true, white: true, maxerr: 50, indent: 2, unparam: true */
 /*global jQuery : false, $ : false */
 
-//(function () {
+(function () {
   "use strict";
   var $ = jQuery, 
       nullity, 
@@ -78,7 +81,7 @@
     return destination;
   };
 
-  $.fn.listicle = function(list1, list2){
+  $.fn.listicle = function(list1, list2, url){
     var root = $(this), list1Element, list2Element;
 
     //setup, clear this out
@@ -106,6 +109,7 @@
       var id = $(this).attr("id"),
           inList = secondList,
           otherList = firstList,
+          toListId = -1;
           listObject = null;
       
       //find which list it's in
@@ -115,10 +119,16 @@
           otherList = secondList;
         }
       });
+      toListId = otherList === firstList ? 1 : 2;
       
       //move it to the other
       listObject = removeById(inList, unIdIfy(id))[0];
       otherList.push(listObject);
+      
+      //update to server if the thing is provided
+      if( !nullity(url) ){
+        $.get(url, { id : unIdIfy(id), list : toListId});
+      }
       
       //and move the DOM element
       if( inList === firstList ){ animate($(this), $(".listicle-secondList")); }
@@ -134,4 +144,4 @@
     });
     
   };
-//}());
+}());
