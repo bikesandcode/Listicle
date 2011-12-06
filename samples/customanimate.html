@@ -1,0 +1,25 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Listicle Sample 1</h1>
+    <div id="attachHere"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="../jquery.listicle.js"></script>
+    <script>
+		var list1 = ["Alex", "Bob", "Carl"],
+			list2 = ["Alexis", "Brenda", "Carla"];
+			
+		var customAnimate = function( liElement, appendToUl ){
+			liElement.slideUp(function(){
+				liElement.css("display", "none");
+				liElement.appendTo(appendToUl);
+				liElement.slideDown();
+			});
+		};
+	
+		$("#attachHere").listicle(list1, list2, {animateFunction : customAnimate});
+    </script>
+  </body>
+</html>

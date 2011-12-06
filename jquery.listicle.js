@@ -29,6 +29,7 @@
       idIfy,
       unIdIfy,
       handleInputList,
+      pushChange,
       firstList = [], secondList = [];
 
   //Crockford friendly
@@ -80,15 +81,25 @@
     });
     return destination;
   };
+  
+  pushChange = function(url, id, listId){
+    $.get(url, { "id" : id, list : listId});
+  };
 
-  $.fn.listicle = function(list1, list2, url){
-    var root = $(this), list1Element, list2Element;
+  $.fn.listicle = function(list1, list2, options, url){
+    var root = $(this), list1Element, list2Element, settings;
+    
+    settings = {
+      animateFunction : animate,
+      serverPush : pushChange
+    };
+    if( !nullity(options) ){ settings = $.extend(settings, options); }
 
     //setup, clear this out
     root.empty();
 
     //basic usage checks
-    if( nullity(list1) || nullity(list2) ){ throw "Neither lists can be nullish, both must be present" ;}
+    if( nullity(list1) || nullity(list2) ){ throw "Neither lists can be nullish, both must be present"; }
     if( !isArray(list1) || !isArray(list2) ){ throw "Both lists must actually be arrays."; }
 
     //setup data
@@ -109,7 +120,7 @@
       var id = $(this).attr("id"),
           inList = secondList,
           otherList = firstList,
-          toListId = -1;
+          toListId = -1,
           listObject = null;
       
       //find which list it's in
@@ -126,13 +137,11 @@
       otherList.push(listObject);
       
       //update to server if the thing is provided
-      if( !nullity(url) ){
-        $.get(url, { id : unIdIfy(id), list : toListId});
-      }
+      if( !nullity(url) ){ settings.serverPush.call(this, unIdIfy(id), toListId); }
       
       //and move the DOM element
-      if( inList === firstList ){ animate($(this), $(".listicle-secondList")); }
-      else{ animate($(this), $(".listicle-firstList")); }
+      if( inList === firstList ){ settings.animateFunction.call(this, $(this), $(".listicle-secondList")); }
+      else{ settings.animateFunction.call(this, $(this), $(".listicle-firstList")); }
       
       // Logging for verification and such.
       var list1Out = "", list2Out = "";
