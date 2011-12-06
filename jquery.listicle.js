@@ -83,15 +83,17 @@
   };
   
   pushChange = function(url, id, listId){
+    if( nullity(url) ) { return; }
     $.get(url, { "id" : id, list : listId});
   };
 
-  $.fn.listicle = function(list1, list2, options, url){
+  $.fn.listicle = function(list1, list2, options){
     var root = $(this), list1Element, list2Element, settings;
     
     settings = {
+      url : null,
       animateFunction : animate,
-      serverPush : pushChange
+      pushFunction : pushChange
     };
     if( !nullity(options) ){ settings = $.extend(settings, options); }
 
@@ -137,7 +139,7 @@
       otherList.push(listObject);
       
       //update to server if the thing is provided
-      if( !nullity(url) ){ settings.serverPush.call(this, unIdIfy(id), toListId); }
+      settings.pushFunction.call(this, settings.url, unIdIfy(id), toListId);
       
       //and move the DOM element
       if( inList === firstList ){ settings.animateFunction.call(this, $(this), $(".listicle-secondList")); }
